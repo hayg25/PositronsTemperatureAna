@@ -1,4 +1,4 @@
-function[Corr_data,timeFull,chanFull,chanRef,delta_temp,raw_max_jump] =  Ana_Ref_TimeSlices(refData,chanData,Time,min1,max1,butter_cut,min2)
+function[Corr_data,timeFull,chanFull,chanRef,delta_temp,raw_max_jump] =  Ana_Ref_ZeroRef(refData,chanData,Time,min1,max1,butter_cut,min2)
 close all
 
 
@@ -19,10 +19,10 @@ subplot = @(m,n,p) subtightplot (m, n, p, [0.04 0.02 0.01], [0.04 0.02 0.01], [0
 I_Axis_limits=[-0.2,0.3];
 %I_Axis_limits=[0.2,0.7];
 I_Axis_limits=[-2,9];
-%I_Axis_limits=[20,25];
+I_Axis_limits=[20,30];
 
-% Nbins_sec=6000;
- Nbins_sec=12000;
+ Nbins_sec=6000;
+% Nbins_sec=12000;
 % Nbins_sec=2000;
  time_shift=558.3;
  %time_shift=1.73;
@@ -51,9 +51,12 @@ for i=1:Nsensor
 
     corr_temp(i)=mean(lowPassedData(1,200:400) );
     
-    plot(timeFull(:,min1:max1)-time_shift,15*( lowPassedData(1,min1:max1) - mean(lowPassedData(1,200:400))),'linewidth',2,'color',col(5*i-1,:));
-%    plot(min1:max1,15*( lowPassedData(1,min1:max1) - mean(lowPassedData(1,min1:min1+100))),'linewidth',2,'color',col(5*i-1,:));
+ %   plot(timeFull(:,min1:max1)-time_shift,15*( lowPassedData(1,min1:max1) - mean(lowPassedData(1,200:400))),'linewidth',2,'color',col(5*i-1,:));
+    plot(min1:max1,                       15*( lowPassedData(1,min1:max1) - mean(lowPassedData(1,min1:min1+100))),'linewidth',2,'color',col(5*i-1,:));
  
+    
+%% Calculs dans les intervalles de periode du faisceau (ex : 1s ON, 5s OFF = 6s la periode)    
+%% pour les fits il faudra plutot sauver pour chaque intervalle la points dans un tableau qui sera fitté 
    for ibin=1:floor((max1-min2)/Nbins_sec)+1
       max_jump(i,ibin)=15*max(lowPassedData(1,min2+(ibin-1)*Nbins_sec:min2+(ibin)*Nbins_sec))-corr_temp(i);
       raw_max_jump(i,ibin)=15*max(lowPassedData(1,min2+(ibin-1)*Nbins_sec:min2+(ibin)*Nbins_sec))-15*min(lowPassedData(1,min2+(ibin-1)*Nbins_sec:min2+(ibin)*Nbins_sec));
@@ -70,7 +73,8 @@ for i=1:Nsensor
 end
 for i=1:floor((max1-min2)/Nbins_sec)+1
     bin_droite=min2+(i-1)*Nbins_sec  ;
-    plot([timeFull(:,bin_droite)- time_shift,timeFull(:,bin_droite)- time_shift],I_Axis_limits,'-')    
+%    plot([timeFull(:,bin_droite)- time_shift,timeFull(:,bin_droite)- time_shift],I_Axis_limits,'-')    
+    plot([bin_droite,bin_droite]- time_shift,I_Axis_limits,'-')    
 end
 
 %%% Ref data -- 
