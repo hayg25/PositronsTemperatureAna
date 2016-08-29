@@ -21,16 +21,18 @@ size(chanFull)
 % I_Axis_limits=[0.2,0.7];
 % I_Axis_limits=[-2,9];
 % I_Axis_limits=[20,30];
-I_Axis_limits=[-1,1];
+I_Axis_limits=[-1,10];
 
- Nbins_sec=6000;
-% Nbins_sec=12000;
+%  Nbins_sec=6000;
+ Nbins_sec=12000;
 % Nbins_sec=2000;
 % time_shift=558.3;
 % time_shift=1.73;
 % time_shift=5280;
 
-time_shift=0;
+
+period_beam_in_Bins = Nbins_sec; % 6s for 1 period = [1s ON, 5s OFF]
+time_shift=540.3;
  
  
 % plo_id=[9,5,1,3,7]
@@ -63,11 +65,37 @@ for i=1:Nsensor
 %% ---------------------------------------------------------------
 
     corr_temp(i)=mean(lowPassedData(1,200:400) ); %% ---  ?? pourquoi ? 
-    
+
+%%% --------------------------------------------------------------------------    
    plot(timeFull(:,min1:max1) -  time_shift,15*( lowPassedData(1,min1:max1) - mean(lowPassedData(1,min1:min1+100))),'linewidth',2,'color',col(5*i-1,:));
+    
+   %% boucle sur le nombre de periodes pour pouvoir effectuer les fits de la forme a.exp(-(t+d+t0)/tau1)*(1-exp(-(t+d+t0)/tau2))
+   for iperiod = 1:(max1-min1)/period_beam_in_Bins
+       figure(122+iperiod)
+       hold on   
+       fprintf('iperiod : %d %d %d  \n',iperiod,max1-min1,period_beam_in_Bins);       
+%        plot(timeFull(:,min1+(iperiod-1)*period_beam_in_Bins:min1+(iperiod)*period_beam_in_Bins) - time_shift,15*( lowPassedData(1,min1+(iperiod-1)*period_beam_in_Bins:min1+(iperiod)*period_beam_in_Bins) - mean(lowPassedData(1,min1:min1+100))),'linewidth',2,'color',col(5*i-1,:));
+       
+       myfittype = fittype('a*exp(-(t+t0)/tau1)*(1-exp(-(t+t0)/tau2))','dependent',{'period_temp'},'independent',{'period_time'},'coefficients',{'a','t0','tau1','tau2'})
+        model1 = fittype('kappa*x.^pow');
+       Lim1=min2+(iperiod-1)*period_beam_in_Bins;
+       Lim2=min2+(iperiod)*period_beam_in_Bins;
+       temp_shift = mean(lowPassedData(1,min1:min1+100));
+       period_time = timeFull(:,Lim1:Lim2) - time_shift;
+       period_temp = 15*( lowPassedData(1,Lim1:Lim2) - temp_shift);
+%        plot(period_time,period_temp,'linewidth',2,'color',col(5*i-1,:));
+       
+       myfit = fit(period_time',period_temp',myfittype)
+       plot(myfit,period_time,period_temp)
+   end
+%%% --------------------------------------------------------------------------    
+   
+
+
 %     plot(min1:max1,                       15*( lowPassedData(1,min1:max1) - mean(lowPassedData(1,min1:min1+100))),'linewidth',2,'color',col(5*i-1,:));
 %% Calculs dans les intervalles de periode du faisceau (ex : 1s ON, 5s OFF = 6s la periode)    
 %% pour les fits il faudra plutot sauver pour chaque intervalle la points dans un tableau qui sera fitt? 
+%% ne pas oublier le decalage utilise pour les droites permettant de separer chaque periode
    for ibin=1:floor((max1-min2)/Nbins_sec)+1
       max_jump(i,ibin)     = 15*max(lowPassedData(1,min2+(ibin-1)*Nbins_sec:min2+(ibin)*Nbins_sec))-corr_temp(i);
       raw_max_jump(i,ibin) = 15*max(lowPassedData(1,min2+(ibin-1)*Nbins_sec:min2+(ibin)*Nbins_sec))-15*min(lowPassedData(1,min2+(ibin-1)*Nbins_sec:min2+(ibin)*Nbins_sec));
@@ -82,6 +110,10 @@ for i=1:Nsensor
     set(ylhand,'string','Temp [?C]','fontsize',20);  
     legendInfo{i} = ['Sensor No ' num2str(j)];
 end
+
+
+%%% plot les droites qui separent chaque periode de faisceau
+figure(115)
 for i=1:floor((max1-min2)/Nbins_sec)+1
     bin_droite=min2+(i-1)*Nbins_sec  ;
     plot([timeFull(:,bin_droite)- time_shift,timeFull(:,bin_droite)- time_shift], I_Axis_limits,'-')    
