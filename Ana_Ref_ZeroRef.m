@@ -1,4 +1,5 @@
-function[Corr_data,timeFull,chanFull,chanRef,delta_temp,raw_max_jump] =  Ana_Ref_ZeroRef(refData,chanData,Time,min1,max1,butter_cut,min2)
+% function[Corr_data,timeFull,chanFull,chanRef,delta_temp,raw_max_jump,a,t0,tau1,tau2] =  Ana_Ref_ZeroRef(refData,chanData,Time,min1,max1,butter_cut,min2)
+function[tau1,tau2] =  Ana_Ref_ZeroRef(refData,chanData,Time,min1,max1,butter_cut,min2)
 close all
 Nsensor=9 
 
@@ -76,17 +77,46 @@ for i=1:Nsensor
        fprintf('iperiod : %d %d %d  \n',iperiod,max1-min1,period_beam_in_Bins);       
 %        plot(timeFull(:,min1+(iperiod-1)*period_beam_in_Bins:min1+(iperiod)*period_beam_in_Bins) - time_shift,15*( lowPassedData(1,min1+(iperiod-1)*period_beam_in_Bins:min1+(iperiod)*period_beam_in_Bins) - mean(lowPassedData(1,min1:min1+100))),'linewidth',2,'color',col(5*i-1,:));
        
-       myfittype = fittype('a*exp(-(t+t0)/tau1)*(1-exp(-(t+t0)/tau2))','dependent',{'period_temp'},'independent',{'period_time'},'coefficients',{'a','t0','tau1','tau2'})
-        model1 = fittype('kappa*x.^pow');
-       Lim1=min2+(iperiod-1)*period_beam_in_Bins;
-       Lim2=min2+(iperiod)*period_beam_in_Bins;
-       temp_shift = mean(lowPassedData(1,min1:min1+100));
-       period_time = timeFull(:,Lim1:Lim2) - time_shift;
-       period_temp = 15*( lowPassedData(1,Lim1:Lim2) - temp_shift);
-%        plot(period_time,period_temp,'linewidth',2,'color',col(5*i-1,:));
+%        myfittype = fittype('a*exp(-(x+t0)/tau1)*(1-exp(-(x+t0)/tau2))','coefficients',{'a','t0','tau1','tau2'});
+       myfittype1   = fittype('a1*exp(-(x+t1)/tau1)','coefficients',{'a1','t1','tau1'}); %% fit the decrease only
+       myfittype2   = fittype('a2*x+tau2' ,'coefficients',{'a2','tau2'}); %% fit the increase only
        
-       myfit = fit(period_time',period_temp',myfittype)
-       plot(myfit,period_time,period_temp)
+       Lim1        = min2+(iperiod-1)*period_beam_in_Bins + floor(period_beam_in_Bins/6.); %% start from peak position to fit only decrease
+       Lim2        = min2+(iperiod)  *period_beam_in_Bins;
+       Lim0        = min2+(iperiod-1)*period_beam_in_Bins; 
+
+       temp_shift  = mean(lowPassedData(1,min1:min1+100));
+       
+       % periode temps et temp partie decroissante 
+       period_time_down = timeFull(:,Lim1:Lim2) - time_shift; %% on retire 6 secondes pour etre toujours dans le meme range
+       period_time_down = period_time_down - min(period_time_down);
+       period_temp_down = 15*( lowPassedData(1,Lim1:Lim2) - temp_shift);
+
+       % periode temps et temp partie croissante 
+       period_time_up   = timeFull(:,Lim0:Lim1) - time_shift; %% on retire 6 secondes pour etre toujours dans le meme range
+       period_time_up   = period_time_up - min(period_time_up);
+       period_temp_up   = 15*( lowPassedData(1,Lim0:Lim1) - temp_shift);
+     
+       fprintf('%d %g %g \n', min(period_time_down), max(period_time_down),iperiod);
+       
+
+       %        plot(period_time_down,period_temp_down,'linewidth',2,'color',col(5*i-1,:));
+       %        options = fitoptions('Method','NonlinearLeastSquares','lower',[-Inf,-Inf,3],'upper',[Inf,Inf,12]) ;
+   
+       options = fitoptions('Method','NonlinearLeastSquares') ;
+
+       [myfit1,gof1]   = fit(period_time_down',period_temp_down',myfittype1,options)
+       a1(i,iperiod)   = myfit1.a1;
+       t1(i,iperiod)   = myfit1.t1;
+       tau1(i,iperiod) = myfit1.tau1;
+       
+       [myfit2,gof2]   = fit(period_time_up',period_temp_up',myfittype2,options)            
+       a2(i,iperiod)   = myfit2.a2;
+       % t2(i,iperiod)   = myfit2.t2;
+       tau2(i,iperiod) = myfit2.tau2;
+       
+       plot(myfit1 ,period_time_down ,period_temp_down )
+       plot(myfit2 ,period_time_up   ,period_temp_up   )
    end
 %%% --------------------------------------------------------------------------    
    
