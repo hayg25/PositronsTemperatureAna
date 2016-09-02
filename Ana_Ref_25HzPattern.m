@@ -1,7 +1,7 @@
 % function[Corr_data,timeFull,chanFull,chanRef,delta_temp,raw_max_jump,a,t0,tau1,tau2] =  Ana_Ref_ZeroRef(refData,chanData,Time,min1,max1,butter_cut,min2)
 function[tau1,a2,tau2,rsquare1,rsquare2] =  Ana_Ref_ZeroRef(refData,chanData,Time,min1,max1,butter_cut,min2)
 close all
-Nsensor=9 
+Nsensor=9; 
 
 
 %% try to combine the analysis into a single file
