@@ -1,8 +1,9 @@
 % function[Corr_data,timeFull,chanFull,chanRef,delta_temp,raw_max_jump,a,t0,tau1,tau2] =  Ana_Ref_ZeroRef(refData,chanData,Time,min1,max1,butter_cut,min2)
-function[a1,tau1,a2,tau2,b,rsquare] =  Ana_Ref_ZeroRef(refData,chanData,Time,min1,max1,butter_cut,make_fit)
+%function[a1,tau1,a2,tau2,b,rsquare] =  Ana_Ref_ZeroRef(refData,chanData,Time,min1,max1,butter_cut,make_fit)
+function[period_time_down,period_temp_down] =  Ana_Ref_ZeroRef(refData,chanData,Time,min1,max1,butter_cut,make_fit)
 % function[period_time_down,period_temp_down] =  Ana_Ref_ZeroRef(refData,chanData,Time,min1,max1,butter_cut,min2)
 close all
-Nsensor=9 
+Nsensor=1 
 
 
 %% try to combine the analysis into a single file
@@ -87,7 +88,7 @@ for i=1:Nsensor
         period_time_down = timeFull(:,min1:max1) -  time_shift;
         period_temp_down = 15*( lowPassedData(1,min1:max1));
     %   options1         = fitoptions('Method','NonlinearLeastSquares','StartPoint',[1.5,10.14,0.99,0.03,24]);
-    %   options1         = fitoptions('Method','NonlinearLeastSquares');
+        options1         = fitoptions('Method','NonlinearLeastSquares');
     
     %  --- > Fit decroissance fin 25Hz pattenrn  
     %   options1         = fitoptions('Method','NonlinearLeastSquares','StartPoint',[2,0.1,-5,-0.003,30]);
