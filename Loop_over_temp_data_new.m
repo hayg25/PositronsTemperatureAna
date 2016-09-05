@@ -70,13 +70,13 @@ for idi=1:length(nameFolds)
      if idEnd>Nfiles
          error(' idEnd>Nfiles ');
      end
-     k=0
+     k=0;
      for i=idStart:idEnd
-         k=k+1
+         k=k+1;
 %         basedir 
 %         char(nameFolds(idi))
         opened_file=sprintf('%s%s/positrons$0$%d.csv',basedir,char(nameFolds(idi)),i-1);
-%         fprintf('opened file --> %s\n',opened_file);
+        fprintf('opened file --> %s\n',opened_file);
 
 %         [chanI_Env(i,:,:),chanI(i,:,:),realTime(i,:,:),DeltaTime(i,:,:)] = temp_meas_1s(opened_file);
 %         plot(DeltaTime(i,:,:),p1*chanI(i,:,1));

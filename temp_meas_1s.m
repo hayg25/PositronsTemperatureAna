@@ -16,7 +16,7 @@ fid = fopen(fich);
 
      %data = textscan(fid,'%s %f %f','Delimiter',',','HeaderLines',71);
      fclose(fid);   
-     length(data) 
+%      length(data) 
      for iC = 1:length(data)         
          if iC==1
              data1{iC} = data{iC}(1:end-2, :);

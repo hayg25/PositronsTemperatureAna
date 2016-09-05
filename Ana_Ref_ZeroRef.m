@@ -19,8 +19,9 @@ Granular_sensor_positions=[13,8,14,18,12,3,15,23,11];
 
 % subplot = @(m,n,p) subtightplot (m, n, p, [0.04 0.02 0.01], [0.04 0.02 0.01], [0.04 0.02 0.01]);
 
-I_Axis_limits=[-1,10];
-I_Axis_limits=[23,50];
+% I_Axis_limits=[-1,10];
+% I_Axis_limits=[23,50];
+I_Axis_limits=[22,24];
 
 %  Nbins_sec=6000;
  Nbins_sec=12000;
@@ -30,7 +31,8 @@ I_Axis_limits=[23,50];
 % time_shift=5280;
 % time_shift=1026.5;
 % time_shift=3240;
-time_shift=4255;
+% time_shift=4255;
+time_shift=55;
 
 % plo_id=[9,5,1,3,7]
 plo_id = [1:9];
