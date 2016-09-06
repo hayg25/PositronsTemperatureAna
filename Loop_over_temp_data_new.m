@@ -1,8 +1,8 @@
 function[chanI_Env,chanI,realTime,DeltaTime] =  Loop_over_temp_data(id0,idStart,idEnd)
 close all 
 
-Nevents=120000; % in each temp file ... this could be read in the header 
-% Nevents=60000; % in each temp file ... this could be read in the header 
+% Nevents=120000; % in each temp file ... this could be read in the header 
+Nevents=60000; % in each temp file ... this could be read in the header 
 Nsensor=9; % number of temperature sensor 
 
 %% try to allocate memory before filling the array 

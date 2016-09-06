@@ -100,15 +100,13 @@ for i=1:Nsensor
     if make_fit == 1
         period_time_down = timeFull(:,min1:max1) -  time_shift;
         period_temp_down = 15*( lowPassedData(1,min1:max1));
-<<<<<<< .merge_file_lDMa5Q
+
     %   options1         = fitoptions('Method','NonlinearLeastSquares','StartPoint',[1.5,10.14,0.99,0.03,24]);
         options1         = fitoptions('Method','NonlinearLeastSquares');
-=======
 %         options1         = fitoptions('Method','NonlinearLeastSquares','StartPoint',[1.5,10.14,0.99,0.03,24]);
 %         options1         = fitoptions('Method','NonlinearLeastSquares','StartPoint',[40, 0.003, -18,-0.22]); %% 25Hz continuous partie croissante
         options1         = fitoptions('Method','NonlinearLeastSquares','StartPoint',[15, -0.1, 30,-0.0005]); %% 25Hz continuous partie decroissante
 %        options1         = fitoptions('Method','NonlinearLeastSquares');
->>>>>>> .merge_file_NyDRgs
     
     %  --- > Fit decroissance fin 25Hz pattenrn  
     %   options1         = fitoptions('Method','NonlinearLeastSquares','StartPoint',[2,0.1,-5,-0.003,30]);

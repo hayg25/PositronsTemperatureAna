@@ -1,6 +1,7 @@
 % function[Corr_data,timeFull,chanFull,chanRef,delta_temp,raw_max_jump,a,t0,tau1,tau2] =  Ana_Ref_ZeroRef(refData,chanData,Time,min1,max1,butter_cut,min2)
-%function[tau1,a2,tau2,rsquare1,rsquare2] =  Ana_Ref_1HzPattern(refData,chanData,Time,min1,max1,butter_cut,min2,make_fit)
-function[period_time_up,period_time_down] =  Ana_Ref_1HzPattern(refData,chanData,Time,min1,max1,butter_cut,min2,make_fit)
+%function[a1,tau1,a2,tau2] =  Ana_Ref_1HzPattern(refData,chanData,Time,min1,max1,butter_cut,min2,make_fit)
+% function[period_time_all,period_temp_all] =  Ana_Ref_1HzPattern(refData,chanData,Time,min1,max1,butter_cut,min2,make_fit)
+function[a1,tau1,a2,tau2,rsquare]         =  Ana_Ref_1HzPattern(refData,chanData,Time,min1,max1,butter_cut,min2,make_fit,calc_fit)
 close all
 Nsensor=8; 
 
@@ -18,7 +19,7 @@ Granular_sensor_positions=[13,8,14,18,12,3,15,23,11];
 
 size(chanFull)
 
-% subplot = @(m,n,p) subtightplot (m, n, p, [0.04 0.02 0.01], [0.04 0.02 0.01], [0.04 0.02 0.01]);
+subplot = @(m,n,p) subtightplot (m, n, p, [0.04 0.02 0.01], [0.04 0.02 0.01], [0.04 0.02 0.01]);
 % I_Axis_limits=[-0.2,0.3];
 % I_Axis_limits=[0.2,0.7];
 % I_Axis_limits=[-2,9];
@@ -27,7 +28,7 @@ I_Axis_limits=[-0.1,0.1];
 
 %  Nbins_sec=6000;
 % Nbins_sec=12000;
- Nbins_sec=2000;
+ Nbins_sec=1000;
 % time_shift=558.3;
 % time_shift=1.73;
 % time_shift=5280;
@@ -45,13 +46,19 @@ plo_id=[1:9]
 max_jump=zeros(Nsensor,floor((max1-min2)/Nbins_sec)+1);
 raw_max_jump=zeros(Nsensor,floor((max1-min2)/Nbins_sec)+1);
 
+a1      = zeros(Nsensor,floor((max1-min2)/Nbins_sec)+1);
+tau1    = zeros(Nsensor,floor((max1-min2)/Nbins_sec)+1);
+a2      = zeros(Nsensor,floor((max1-min2)/Nbins_sec)+1);
+tau2    = zeros(Nsensor,floor((max1-min2)/Nbins_sec)+1);
+rsquare = zeros(Nsensor,floor((max1-min2)/Nbins_sec)+1);
+
 min_temp=zeros(Nsensor);
 max_temp=zeros(Nsensor);
 delta_temp=zeros(Nsensor);
 corr_temp=zeros(Nsensor);
 
-%for i=1:Nsensor
-for i=2:2
+% for i=1:Nsensor
+ for i=1:1
     j=plo_id(i);
     %% --- FFT -----------------
     % ----- NOT USED ----    signal_fft=fft(chanFull(1,:,j));
@@ -75,85 +82,60 @@ for i=2:2
     
    %% boucle sur le nombre de periodes pour pouvoir effectuer les fits de la forme a.exp(-(t+d+t0)/tau1)*(1-exp(-(t+d+t0)/tau2))
 
+   figure(122)
+
    if make_fit==1
        for iperiod = 1:(max1-min1)/period_beam_in_Bins
-       figure(122+iperiod)
-       hold on   
-       fprintf('iperiod : %d %d %d  \n',iperiod,max1-min1,period_beam_in_Bins);       
-%        plot(timeFull(:,min1+(iperiod-1)*period_beam_in_Bins:min1+(iperiod)*period_beam_in_Bins) - time_shift,15*( lowPassedData(1,min1+(iperiod-1)*period_beam_in_Bins:min1+(iperiod)*period_beam_in_Bins) - mean(lowPassedData(1,min1:min1+100))),'linewidth',2,'color',col(5*i-1,:));
-       
-%        myfittype = fittype('a*exp(-(x+t0)/tau1)*(1-exp(-(x+t0)/tau2))','coefficients',{'a','t0','tau1','tau2'});
-       myfittype1   = fittype('a1*exp(-(x+t1)/tau1)','coefficients',{'a1','t1','tau1'}); %% fit the decrease only
-       myfittype2   = fittype('a2*x+tau2' ,'coefficients',{'a2','tau2'}); %% fit the increase only
-       
-       Lim1        = min2+(iperiod-1)*period_beam_in_Bins + floor(period_beam_in_Bins/6.); %% start from peak position to fit only decrease
-       Lim2        = min2+(iperiod)  *period_beam_in_Bins;
-       Lim0        = min2+(iperiod-1)*period_beam_in_Bins; 
+           n_row = floor(sqrt((max1-min1)/period_beam_in_Bins))+1;
+           subplot(n_row,n_row,iperiod);
+           hold on   
 
-       temp_shift  = mean(lowPassedData(1,min1:min1+100));
-       
+%            fprintf('iperiod : %d %d %d  \n',iperiod,max1-min1,period_beam_in_Bins);       
+    %        plot(timeFull(:,min1+(iperiod-1)*period_beam_in_Bins:min1+(iperiod)*period_beam_in_Bins) - time_shift,15*( lowPassedData(1,min1+(iperiod-1)*period_beam_in_Bins:min1+(iperiod)*period_beam_in_Bins) - mean(lowPassedData(1,min1:min1+100))),'linewidth',2,'color',col(5*i-1,:));
 
-       % periode temps et temp partie croissante 
-       period_time_up   = timeFull(:,Lim0:Lim1) - time_shift; %% on retire 6 secondes pour etre toujours dans le meme range
-       period_time_up   = period_time_up - min(period_time_up);
-       period_temp_up   = 15*( lowPassedData(1,Lim0:Lim1) - temp_shift);
+           myfittype = fittype('a1*exp(tau1*x)+a2*exp(tau2*x)','coefficients',{'a1','tau1','a2','tau2'});
 
-       % periode temps et temp partie decroissante 
-       period_time_down = timeFull(:,Lim1:Lim2) - time_shift; %% on retire 6 secondes pour etre toujours dans le meme range
-       period_time_down = period_time_down - min(period_time_down)+max(period_time_up);
-       period_temp_down = 15*( lowPassedData(1,Lim1:Lim2) - temp_shift);
+           Lim1        = min2+(iperiod-1)*period_beam_in_Bins + floor(period_beam_in_Bins/6.); %% start from peak position to fit only decrease
+           Lim2        = min2+(iperiod)  *period_beam_in_Bins;
+           Lim0        = min2+(iperiod-1)*period_beam_in_Bins; 
 
-       fprintf('%d %g %g \n', min(period_time_down), max(period_time_down),iperiod);
-       
-
-       %        plot(period_time_down,period_temp_down,'linewidth',2,'color',col(5*i-1,:));
-       %        options = fitoptions('Method','NonlinearLeastSquares','lower',[-Inf,-Inf,3],'upper',[Inf,Inf,12]) ;
-   
-       options1 = fitoptions('Method','NonlinearLeastSquares','StartPoint',[4.578,1.154,2.347]) ;
-       options2 = fitoptions('Method','NonlinearLeastSquares','StartPoint',[1.676,-0.022]) ;
-
-       [myfit1,gof1]   = fit(period_time_down',period_temp_down',myfittype1,options1)
-       if gof1.rsquare > 0.75     
-         a1(i,iperiod)       = myfit1.a1;
-         t1(i,iperiod)       = myfit1.t1;
-         tau1(i,iperiod)     = myfit1.tau1;
-         rsquare1(i,iperiod) = gof1.rsquare;
-       else 
-           fprintf(' Bad fitting --> \n');
-           gof1
-       end       
-       [myfit2,gof2]   = fit(period_time_up',period_temp_up',myfittype2,options2)            
-       if gof2.rsquare > 0.75     
-         a2(i,iperiod)       = myfit2.a2;
-         tau2(i,iperiod)     = myfit2.tau2;
-         rsquare2(i,iperiod) = gof2.rsquare;
-       else 
-           fprintf(' Bad fitting --> \n');
-           gof2         
-       end       
-       
-       if gof1.rsquare > 0.75
-               pl1 = plot(myfit1 ,period_time_down ,period_temp_down,'--mo')
-               set(pl1,'Color',col(5*i-1,:),'LineWidth',2)
-        end 
-       if gof2.rsquare > 0.75
-               pl2 = plot(myfit2 ,period_time_up   ,period_temp_up,'-.r*')
-               set(pl2,'Color',col(5*i-1,:),'LineWidth',2)
-       end 
+           temp_shift  = mean(lowPassedData(1,min1:min1+100));
 
 
+           % periode temps et temp partie croissante 
+           period_time_all   = timeFull(:,Lim0:Lim2) - time_shift; %% on retire 6 secondes pour etre toujours dans le meme range
+           period_time_all   = period_time_all - min(period_time_all);
+           period_temp_all   = 15*( lowPassedData(1,Lim0:Lim2) - temp_shift);
 
-       % legend( 'data1','Fit1','data2','Fit2','data3','Fit3')
 
-      set(gca,'FontSize',20)
-      set(gcf, 'color', 'w');
-      xlhand = get(gca,'xlabel');
-      set(xlhand,'string','Time [sec]','fontsize',20);  
-      ylhand = get(gca,'ylabel');
-      set(ylhand,'string','Temperature increase [^{\circ}C]','fontsize',20);  
+%            fprintf('%d %g %g \n', min(period_time_all), max(period_time_all),iperiod);
 
-       
-   end
+           options  = fitoptions('Method','NonlinearLeastSquares','StartPoint',[-0.15,-19,0.12,-3]) ;
+
+
+          plot(period_time_all ,period_temp_all,'--mo')
+
+          if calc_fit ==1  
+              [myfit,gof]   = fit(period_time_all',period_temp_all',myfittype,options)
+              pl1 = plot(myfit);   
+              set(pl1,'Color','r','LineWidth',2)
+          
+             
+              a1(i,iperiod)       = myfit.a1;
+              tau1(i,iperiod)     = myfit.tau1;
+              a2(i,iperiod)       = myfit.a2;
+              tau2(i,iperiod)     = myfit.tau2;
+              rsquare(i,iperiod)  = gof.rsquare;
+          end
+          xlim([0,1]);
+
+          set(gca,'FontSize',20)
+          set(gcf, 'color', 'w');
+          xlhand = get(gca,'xlabel');
+          set(xlhand,'string','Time [sec]','fontsize',20);  
+          ylhand = get(gca,'ylabel');
+          set(ylhand,'string','Temperature increase [^{\circ}C]','fontsize',20);     
+       end
    end
    
    %%% --------------------------------------------------------------------------
