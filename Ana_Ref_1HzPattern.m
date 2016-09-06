@@ -1,7 +1,8 @@
 % function[Corr_data,timeFull,chanFull,chanRef,delta_temp,raw_max_jump,a,t0,tau1,tau2] =  Ana_Ref_ZeroRef(refData,chanData,Time,min1,max1,butter_cut,min2)
-function[tau1,a2,tau2,rsquare1,rsquare2] =  Ana_Ref_1HzPattern(refData,chanData,Time,min1,max1,butter_cut,min2,make_fit)
+%function[tau1,a2,tau2,rsquare1,rsquare2] =  Ana_Ref_1HzPattern(refData,chanData,Time,min1,max1,butter_cut,min2,make_fit)
+function[period_time_up,period_time_down] =  Ana_Ref_1HzPattern(refData,chanData,Time,min1,max1,butter_cut,min2,make_fit)
 close all
-Nsensor=9; 
+Nsensor=8; 
 
 
 %% try to combine the analysis into a single file
@@ -25,15 +26,16 @@ size(chanFull)
 I_Axis_limits=[-0.1,0.1];
 
 %  Nbins_sec=6000;
- Nbins_sec=12000;
-% Nbins_sec=2000;
+% Nbins_sec=12000;
+ Nbins_sec=2000;
 % time_shift=558.3;
 % time_shift=1.73;
 % time_shift=5280;
 
 
-period_beam_in_Bins = Nbins_sec/6; % 1s for 1 period = [1s ON, 1s OFF]
-time_shift=540.3;
+period_beam_in_Bins = Nbins_sec; % 1s for 1 period = [1s ON, 1s OFF]
+%time_shift=540.3;
+time_shift=60;
  
  
 % plo_id=[9,5,1,3,7]
@@ -48,7 +50,8 @@ max_temp=zeros(Nsensor);
 delta_temp=zeros(Nsensor);
 corr_temp=zeros(Nsensor);
 
-for i=1:Nsensor
+%for i=1:Nsensor
+for i=2:2
     j=plo_id(i);
     %% --- FFT -----------------
     % ----- NOT USED ----    signal_fft=fft(chanFull(1,:,j));
@@ -195,7 +198,7 @@ lowPassedRefData=filter(b,a,chanRef(1,:));
 
 
 figure(115)
-legend(legendInfo,'FontSize',18);
+% legend(legendInfo,'FontSize',18);
 set(gca,'FontSize',20)
 set(gcf, 'color', 'w');
 xlhand = get(gca,'xlabel');
