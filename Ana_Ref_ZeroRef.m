@@ -1,17 +1,15 @@
 % function[Corr_data,timeFull,chanFull,chanRef,delta_temp,raw_max_jump,a,t0,tau1,tau2] =  Ana_Ref_ZeroRef(refData,chanData,Time,min1,max1,butter_cut,min2)
-<<<<<<< .merge_file_lDMa5Q
 %function[a1,tau1,a2,tau2,b,rsquare] =  Ana_Ref_ZeroRef(refData,chanData,Time,min1,max1,butter_cut,make_fit)
 function[period_time_down,period_temp_down] =  Ana_Ref_ZeroRef(refData,chanData,Time,min1,max1,butter_cut,make_fit)
 % function[period_time_down,period_temp_down] =  Ana_Ref_ZeroRef(refData,chanData,Time,min1,max1,butter_cut,min2)
 close all
 Nsensor=1 
-=======
+
  function[a1,tau1,a2,tau2,b,rsquare] =  Ana_Ref_ZeroRef(refData,chanData,Time,min1,max1,butter_cut,make_fit)
 %  function[period_time_down,period_temp_down] =  Ana_Ref_ZeroRef(refData,chanData,Time,min1,max1,butter_cut,make_fit)
 % function[period_time_down,period_temp_down] =  Ana_Ref_ZeroRef(refData,chanData,Time,min1,max1,butter_cut,min2)
 close all
 Nsensor=9; 
->>>>>>> .merge_file_NyDRgs
 
 
 %% try to combine the analysis into a single file
