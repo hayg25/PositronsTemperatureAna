@@ -61,7 +61,7 @@ for i=1:Nsensor
     xlhand = get(gca,'xlabel');
     set(xlhand,'string','Time [sec]','fontsize',20);  
     ylhand = get(gca,'ylabel');
-    set(ylhand,'string','Temp [°C]','fontsize',20);  
+    set(ylhand,'string','Temp [?C]','fontsize',20);  
     legendInfo{i} = ['Sensor No ' num2str(j)];
 end
 % for i=1:floor((max1-min1)/Nbins_sec)+1
@@ -82,19 +82,19 @@ figure(115)
 % legendInfo{10} = ['Sensor No ' num2str(10)];
  legend(legendInfo,'FontSize',18);
 
-figure(222)
-hold on
-for i=1:Nsensor
-    plot(max_jump(i,:),'linewidth',2,'color',col(5*i-1,:))
-end
- legend(legendInfo,'FontSize',18);
-
-figure(223)
-hold on
-for i=1:Nsensor
-    plot(raw_max_jump(i,:),'linewidth',2,'color',col(5*i-1,:))
-end
- legend(legendInfo,'FontSize',18);
-
+% figure(222)
+% hold on
+% for i=1:Nsensor
+%     plot(max_jump(i,:),'linewidth',2,'color',col(5*i-1,:))
+% end
+%  legend(legendInfo,'FontSize',18);
+% 
+% figure(223)
+% hold on
+% for i=1:Nsensor
+%     plot(raw_max_jump(i,:),'linewidth',2,'color',col(5*i-1,:))
+% end
+%  legend(legendInfo,'FontSize',18);
+% 
 
 
