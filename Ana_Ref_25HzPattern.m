@@ -1,7 +1,7 @@
 % function[Corr_data,timeFull,chanFull,chanRef,delta_temp,raw_max_jump,a,t0,tau1,tau2] =  Ana_Ref_ZeroRef(refData,chanData,Time,min1,max1,butter_cut,min2,make_fit)
 function[max_temp_period,norm_max_temp] =  Ana_Ref_25HzPattern(refData,chanData,Time,min1,max1,butter_cut,min2,make_fit)
 close all
-Nsensor=8; 
+Nsensor=9; 
 Nperiod = 80;
 
 %% try to combine the analysis into a single file
