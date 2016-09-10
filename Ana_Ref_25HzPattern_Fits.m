@@ -24,7 +24,7 @@ size(chanFull)
 % I_Axis_limits=[20,30];
 I_Axis_limits=[-1,10];
 
-  Nbins_sec=6000;
+  Nbins_sec=12000;
 %  Nbins_sec=12000;
 % Nbins_sec=2000;
 % time_shift=558.3;

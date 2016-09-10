@@ -22,9 +22,9 @@ size(chanFull)
 % I_Axis_limits=[0.2,0.7];
 % I_Axis_limits=[-2,9];
 % I_Axis_limits=[20,30];
-I_Axis_limits=[-1,10];
+I_Axis_limits=[24,32];
 
-  Nbins_sec=6000;
+  Nbins_sec=12000;
 %  Nbins_sec=12000;
 % Nbins_sec=2000;
 % time_shift=558.3;
@@ -70,7 +70,7 @@ hold on
 k=0
 for i=1:Nsensor
     j=plo_id(i);
-    k = k+1
+    k = k+1;
     %% --- FFT -----------------
     % ----- NOT USED ----    signal_fft=fft(chanFull(1,:,j));
     %% Low pass filter
@@ -155,6 +155,14 @@ legend(legendInfo,'FontSize',18);
  ylhand = get(gca,'ylabel');
  set(ylhand,'string','Temperature increase [^{\circ}C]','fontsize',20);  
    
+%%% plot les droites qui separent chaque periode de faisceau
+figure(115)
+for i=1:floor((max1-min2)/Nbins_sec)+1
+    bin_droite=min2+(i-1)*Nbins_sec  ;
+    plot([timeFull(:,bin_droite)- time_shift,timeFull(:,bin_droite)- time_shift], I_Axis_limits,'-')    
+end
+
+
 
 
 %%% plot les droites qui separent chaque periode de faisceau
