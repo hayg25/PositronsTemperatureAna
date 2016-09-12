@@ -24,7 +24,7 @@ size(chanFull)
 % I_Axis_limits=[20,30];
 I_Axis_limits=[24,32];
 
-  Nbins_sec=12000;
+  Nbins_sec=6000;
 %  Nbins_sec=12000;
 % Nbins_sec=2000;
 % time_shift=558.3;
@@ -33,7 +33,7 @@ I_Axis_limits=[24,32];
 
 
 period_beam_in_Bins = Nbins_sec; % 6s for 1 period = [1s ON, 5s OFF]
-time_shift=540.3;
+time_shift=240.3;
  
  
 % plo_id=[9,5,1,3,7]
@@ -132,7 +132,9 @@ for i=1:Nsensor
 %% ne pas oublier le decalage utilise pour les droites permettant de separer chaque periode
    for ibin=1:floor((max1-min2)/Nbins_sec)+1
       max_jump(i,ibin)     = 15*max(lowPassedData(1,min2+(ibin-1)*Nbins_sec:min2+(ibin)*Nbins_sec))-corr_temp(i);
-      raw_max_jump(i,ibin) = 15*max(lowPassedData(1,min2+(ibin-1)*Nbins_sec:min2+(ibin)*Nbins_sec))-15*min(lowPassedData(1,min2+(ibin-1)*Nbins_sec:min2+(ibin)*Nbins_sec));
+      raw_max_jump(i,ibin) = 15*(max(lowPassedData(1,min2+(ibin-1)*Nbins_sec:min2+(ibin)*Nbins_sec))-min(lowPassedData(1,min2+(ibin-1)*Nbins_sec:min2+(ibin)*Nbins_sec)));
+      raw_time(i,ibin)     = timeFull(:,min2+(ibin-1)*Nbins_sec);
+%      fprintf('%d %d %d %g %g \n',i,min2+(ibin-1)*Nbins_sec,min2+(ibin)*Nbins_sec,max(lowPassedData(1,min2+(ibin-1)*Nbins_sec:min2+(ibin)*Nbins_sec)),min(lowPassedData(1,min2+(ibin-1)*Nbins_sec:min2+(ibin)*Nbins_sec)) );
    end
     
    
@@ -206,7 +208,8 @@ end
 figure(223)
 hold on
 for i=1:Nsensor
-    plot(raw_max_jump(i,:),'linewidth',3,'color',col(5*i-1,:))
+%    plot(raw_max_jump(i,:),'linewidth',3,'color',col(5*i-1,:))
+    plot(raw_time(i,:)-time_shift,raw_max_jump(i,:),'linewidth',3,'color',col(5*i-1,:))
 end
 legend(legendInfo,'FontSize',18);
  set(gca,'FontSize',20)

@@ -53,12 +53,12 @@ fid = fopen(fich);
 
  %%
  
-% chanV = [data1{3:9}];
-% chanI = [data1{10:18}];
-% chanI_Environment = [data1{19}];
+ chanV = [data1{3:9}];
+ chanI = [data1{10:18}];
+ chanI_Environment = [data1{19}];
 
-  chanV = [data1{3:10}];
-  chanI = [data1{11:19}];
-  chanI_Environment = [data1{20}];
+%  chanV = [data1{3:10}];
+%  chanI = [data1{11:19}];
+%  chanI_Environment = [data1{20}];
 
 %% 
