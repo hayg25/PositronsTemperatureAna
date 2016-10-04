@@ -10,9 +10,9 @@ fid = fopen(fich);
 
 
  if fid>0
-     %data = textscan(fid,'%s %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f','Delimiter',',','HeaderLines',71);
+%      data = textscan(fid,'%s %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f','Delimiter',',','HeaderLines',71);
      %__________ data structure for the last run 
-     data = textscan(fid,'%s %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f','Delimiter',',','HeaderLines',71);
+      data = textscan(fid,'%s %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f','Delimiter',',','HeaderLines',71);
 
      %data = textscan(fid,'%s %f %f','Delimiter',',','HeaderLines',71);
      fclose(fid);   
@@ -53,12 +53,12 @@ fid = fopen(fich);
 
  %%
  
-% chanV = [data1{3:9}];
-% chanI = [data1{10:18}];
-% chanI_Environment = [data1{19}];
+%  chanV = [data1{3:9}];
+%  chanI = [data1{10:18}];
+%  chanI_Environment = [data1{19}];
 
-  chanV = [data1{3:10}];
-  chanI = [data1{11:19}];
-  chanI_Environment = [data1{20}];
+ chanV = [data1{3:10}];
+ chanI = [data1{11:19}];
+ chanI_Environment = [data1{20}];
 
 %% 

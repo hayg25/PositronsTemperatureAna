@@ -1,5 +1,8 @@
 function[fit_mu,fit_sigma] =  PlotGranular(Data,Nmin,Nbins)
-
+%%%  Data = tableau contenant les max des tempetatures pour N = Nmins:Nbins
+%%%  periodes, Data(i,Nmin:Nbins) i etant le numero de bille. pour faire
+%%%  les histogrammes il faut choisir une region ou le courant est stable
+%%%  pour ne pas avoir un etalement dependant du courant. (ou alors il faut corriger par le courant)
 
 figure(33)
 I_Axis_limits=[0,0.2];  
@@ -25,10 +28,16 @@ subplot = @(m,n,p) subtightplot (m, n, p, [0.02 0.02 0.01], [0.02 0.02 0.01], [0
     set(gca,'FontSize',12)
 
     rr=Data(i,Nmin:Nbins);
-    pd=fitdist(rr(:),'normal');
-    fit_mu(i) 	  = pd.mu;
-    fit_sigma(i)  = pd.sigma;  
-    fprintf('mu %g  sigma %g \n',pd.mu,pd.sigma);
+%     pd=fitdist(rr(:),'normal');
+%     fit_mu(i) 	  = pd.mu;
+%     fit_sigma(i)  = pd.sigma;  
+%     fprintf('mu %g  sigma %g \n',pd.mu,pd.sigma);
+
+     fit_mu(i) 	   = Data(i,Nmin:Nbins);
+     fit_sigma(i)  = 0.01;  
+%      fprintf('mu %g  sigma %g \n',pd.mu,pd.sigma);
+
+ 
  end
 
  for i=1:4
@@ -39,10 +48,10 @@ subplot = @(m,n,p) subtightplot (m, n, p, [0.02 0.02 0.01], [0.02 0.02 0.01], [0
 
 figure(122)
 hold on
-% now plot the rise time mean and sigma 
+% now plot the ris?mmmmvm0ln'e time mean and sigma 
 errorbar(fit_mu([9 5 1 3 7]),fit_sigma([9 5 1 3 7]));
 xlabel(' Sensor ID','FontSize',18)
-ylabel('Rise time [s]','FontSize',18)
+ylabel('Temperature rise [^o C]','FontSize',18)
 
 % set the proper label (to get the sensor id)
 ax=gca;

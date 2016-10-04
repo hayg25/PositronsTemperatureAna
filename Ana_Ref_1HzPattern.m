@@ -1,9 +1,14 @@
 % function[Corr_data,timeFull,chanFull,chanRef,delta_temp,raw_max_jump,a,t0,tau1,tau2] =  Ana_Ref_ZeroRef(refData,chanData,Time,min1,max1,butter_cut,min2)
 %function[a1,tau1,a2,tau2] =  Ana_Ref_1HzPattern(refData,chanData,Time,min1,max1,butter_cut,min2,make_fit)
 % function[period_time_all,period_temp_all] =  Ana_Ref_1HzPattern(refData,chanData,Time,min1,max1,butter_cut,min2,make_fit)
-function[a1,tau1,a2,tau2,rsquare]         =  Ana_Ref_1HzPattern(refData,chanData,Time,min1,max1,butter_cut,min2,make_fit,calc_fit)
+
+% function[a1,tau1,a2,tau2,rsquare]         =  Ana_Ref_1HzPattern(refData,chanData,Time,min1,max1,butter_cut,min2,make_fit,calc_fit)
+% function[max_jump,raw_max_jump]   =  Ana_Ref_1HzPattern(refData,chanData,Time,min1,max1,butter_cut,min2,make_fit,calc_fit)
+function[timeFull_out,Sig_out]   =  Ana_Ref_1HzPattern(refData,chanData,Time,min1,max1,butter_cut,min2,make_fit,calc_fit)
+   
+
 close all
-Nsensor=8; 
+Nsensor=9; 
 
 
 %% try to combine the analysis into a single file
@@ -22,13 +27,13 @@ size(chanFull)
 subplot = @(m,n,p) subtightplot (m, n, p, [0.04 0.02 0.01], [0.04 0.02 0.01], [0.04 0.02 0.01]);
 % I_Axis_limits=[-0.2,0.3];
 % I_Axis_limits=[0.2,0.7];
-% I_Axis_limits=[-2,9];
+I_Axis_limits=[-2,9];
 % I_Axis_limits=[20,30];
-I_Axis_limits=[-0.1,0.1];
+% I_Axis_limits=[-0.01,0.15];
 
-%  Nbins_sec=6000;
+Nbins_sec=6000;
 % Nbins_sec=12000;
- Nbins_sec=1000;
+%  Nbins_sec=2000;
 % time_shift=558.3;
 % time_shift=1.73;
 % time_shift=5280;
@@ -43,8 +48,8 @@ time_shift=60;
 plo_id=[1:9]
 % for i=1:9
 
-max_jump=zeros(Nsensor,floor((max1-min2)/Nbins_sec)+1);
-raw_max_jump=zeros(Nsensor,floor((max1-min2)/Nbins_sec)+1);
+max_jump=zeros(Nsensor,floor((max1-min2)/Nbins_sec));
+raw_max_jump=zeros(Nsensor,floor((max1-min2)/Nbins_sec));
 
 a1      = zeros(Nsensor,floor((max1-min2)/Nbins_sec)+1);
 tau1    = zeros(Nsensor,floor((max1-min2)/Nbins_sec)+1);
@@ -52,13 +57,16 @@ a2      = zeros(Nsensor,floor((max1-min2)/Nbins_sec)+1);
 tau2    = zeros(Nsensor,floor((max1-min2)/Nbins_sec)+1);
 rsquare = zeros(Nsensor,floor((max1-min2)/Nbins_sec)+1);
 
+
+
+
 min_temp=zeros(Nsensor);
 max_temp=zeros(Nsensor);
 delta_temp=zeros(Nsensor);
 corr_temp=zeros(Nsensor);
 
-% for i=1:Nsensor
- for i=1:1
+for i=1:Nsensor
+% for i=1:1
     j=plo_id(i);
     %% --- FFT -----------------
     % ----- NOT USED ----    signal_fft=fft(chanFull(1,:,j));
@@ -78,8 +86,14 @@ corr_temp=zeros(Nsensor);
     corr_temp(i)=mean(lowPassedData(1,200:400) ); %% ---  ?? pourquoi ? 
 
 %%% --------------------------------------------------------------------------    
-   plot(timeFull(:,min1:max1) -  time_shift,15*( lowPassedData(1,min1:max1) - mean(lowPassedData(1,min1:min1+100))),'linewidth',2,'color',col(5*i-1,:));
-    
+%    plot(timeFull(:,min1:max1) -  time_shift,15*( lowPassedData(1,min1:max1) - mean(lowPassedData(1,min1:min1+100))),'linewidth',2,'color',col(5*i-1,:));
+   plot(timeFull(:,min1:max1) -  time_shift,15*( lowPassedData(1,min1:max1) - min(lowPassedData(1,min1:max1))),'linewidth',4,'color',col(5*i-1,:));
+%    plot(timeFull(:,min1:max1) -  time_shift+0.15,5*( chanFull(1,min1:max1,1) - min(lowPassedData(1,min1:max1))),'linewidth',1,'color','r');
+   
+   timeFull_out = timeFull(:,min1:max1) -  time_shift;
+   Sig_out      = 15*( lowPassedData(1,min1:max1) - min(lowPassedData(1,min1:max1) ) );
+   
+   
    %% boucle sur le nombre de periodes pour pouvoir effectuer les fits de la forme a.exp(-(t+d+t0)/tau1)*(1-exp(-(t+d+t0)/tau2))
 
    figure(122)
@@ -147,11 +161,13 @@ corr_temp=zeros(Nsensor);
 %% pour les fits il faudra plutot sauver pour chaque intervalle la points dans un tableau qui sera fitt? 
 %% ne pas oublier le decalage utilise pour les droites permettant de separer chaque periode
 
-
-%    for ibin=1:floor((max1-min2)/Nbins_sec)+1
-%       max_jump(i,ibin)     = 15*max(lowPassedData(1,min2+(ibin-1)*Nbins_sec:min2+(ibin)*Nbins_sec))-corr_temp(i);
-%       raw_max_jump(i,ibin) = 15*max(lowPassedData(1,min2+(ibin-1)*Nbins_sec:min2+(ibin)*Nbins_sec))-15*min(lowPassedData(1,min2+(ibin-1)*Nbins_sec:min2+(ibin)*Nbins_sec));
-%    end
+size(lowPassedData)
+    for ibin=1:floor((max1-min2)/Nbins_sec)
+        fprintf('------------  %d %d %d \n',ibin,min2+(ibin-1)*Nbins_sec,min2+(ibin)*Nbins_sec);
+        
+       max_jump(i,ibin)     = 15*max(lowPassedData(1,min2+(ibin-1)*Nbins_sec:min2+(ibin)*Nbins_sec))-corr_temp(i);
+       raw_max_jump(i,ibin) = 15*max(lowPassedData(1,min2+(ibin-1)*Nbins_sec:min2+(ibin)*Nbins_sec))-15*min(lowPassedData(1,min2+(ibin-1)*Nbins_sec:min2+(ibin)*Nbins_sec));
+    end
     
  %   ylim(I_Axis_limits);
     set(gca,'FontSize',20)
@@ -168,8 +184,9 @@ end
 figure(115)
 for i=1:floor((max1-min2)/Nbins_sec)+1
     bin_droite=min2+(i-1)*Nbins_sec  ;
-    plot([timeFull(:,bin_droite)- time_shift,timeFull(:,bin_droite)- time_shift], I_Axis_limits,'-')    
-%   plot([bin_droite,bin_droite]- time_shift                                    , I_Axis_limits,'-')    
+    lin_pl = plot([timeFull(:,bin_droite)- time_shift,timeFull(:,bin_droite)- time_shift], I_Axis_limits,'-');    
+% %   plot([bin_droite,bin_droite]- time_shift                                    , I_Axis_limits,'-')    
+    set(lin_pl,'Color','k','LineWidth',2);
 end
 
 %%% Ref data -- 
@@ -180,13 +197,13 @@ lowPassedRefData=filter(b,a,chanRef(1,:));
 
 
 figure(115)
-% legend(legendInfo,'FontSize',18);
-set(gca,'FontSize',20)
+legend(legendInfo,'FontSize',22);
+set(gca,'FontSize',24)
 set(gcf, 'color', 'w');
 xlhand = get(gca,'xlabel');
-set(xlhand,'string','Time [sec]','fontsize',20);  
+set(xlhand,'string','Time [sec]','fontsize',24);  
 ylhand = get(gca,'ylabel');
-set(ylhand,'string','Temperature increase [^{\circ}C]','fontsize',20);  
+set(ylhand,'string','Temperature increase [^{\circ}C]','fontsize',24);  
     
 % 
 % figure(222)
